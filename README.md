@@ -9,3 +9,6 @@ An add-on that helps you search and add photos to your Google Documents.
 5) Go to the top menu again: "Add-ons > Stock Photos > Open"
 
 Search for a photo you like then click on one to add it to the document where your cursor is.
+
+### Example Screenshot
+![Example Screenshot](https://github.com/GrantAlanDawson/Google-Doc-Stock-Photos-Plugin/blob/master/Screenshot.jpg?raw=true)
