@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <style>
+        body {
+            font: 14px "Century Gothic", Futura, sans-serif;
+            margin: 20px;
+        }
+        
+        .search-controls {
+            margin: 0 10px;
+        }
+        
+        .photo-list {
+            max-height: 238px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        
+        .photo {
+            display: inline-block;
+            height: 130px;
+            width: calc(50% - 20px);
+            margin: 10px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .photo img {
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root" />
+    <script type="text/babel">
+        const SearchContext = React.createContext();
+
+        class SearchProvider extends React.Component {
+            state = {
+                query: 'Business',
+                results: []
+            };
+            
+            componentDidMount() {
+                this.searchPhotos();
+            }
+          
+            updateValue = (key, value) => {
+                this.setState({
+                [key]: value
+                });
+            };
+
+            searchPhotos = () => {
+                fetch(`https://api.unsplash.com/search/photos?client_id=6491e68c6db377cc2186a1c845dd22919d67c75c407c63632d3617e88870b9b1&query=${this.state.query}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('HTTP error, status = ' + response.status);
+                        }
+                        
+                        return response.json();
+                    })
+                    .then(json => {
+                        this.setState({
+                            results: json.results
+                        });
+                    })
+                    .catch(error => {
+                        if (error) {
+                            alert(error.message);
+                        }
+                    });
+            };
+        
+          render() {
+            return <SearchContext.Provider value={{
+                ...this.state, 
+                updateValue: this.updateValue,
+                searchPhotos: this.searchPhotos
+            }}>
+                {this.props.children}
+            </SearchContext.Provider>
+          }
+        }
+        
+        class StockPhoto extends React.Component {
+            insertImage = () => {
+                google.script.run
+                    .withSuccessHandler(google.script.host.close)
+                    .withFailureHandler(() => {
+                        alert('There was an error inserting this image.');
+                    })
+                    .insertImage(this.props.urls.small);
+            };
+            
+            render() {
+                return (
+                    <div className="photo" 
+                        style={{backgroundImage: `url(${this.props.urls.thumb})`}} 
+                        onClick={this.insertImage}
+                    />
+                );
+            }
+        }
+
+        class StockPhotosList extends React.Component {
+            render() {
+                const results = this.props.context.results;
+
+                return (
+                    <div class="photo-list">
+                        {results.map(result => <StockPhoto urls={result.urls} />)}
+                    </div>  
+                );
+            }
+        }
+        
+        class SearchControls extends React.Component {  
+            constructor(props) {
+                super(props);
+                
+                this.inputRef = React.createRef();
+            }
+           
+            componentDidMount() {
+                this.inputRef.select();
+                this.inputRef.focus();
+            }
+            
+            handleChange = event => {
+                this.props.context.updateValue('query', event.target.value);
+            }
+            
+            handleKeyPress = event => {
+                if (event.key === 'Enter') {
+                    this.props.context.searchPhotos();
+                }
+            }
+            
+            handleClick = event => {
+                this.props.context.searchPhotos();
+            };
+            
+            render() {
+                return (
+                    <div className="search-controls">
+                        <input type="text" ref={ref => this.inputRef = ref} value={this.props.context.query} onKeyPress={this.handleKeyPress} onInput={this.handleChange}/>
+                        <button onClick={this.handleClick}>Search</button>
+                    </div>
+                );
+            }
+        }
+
+        class StockPhotosContainer extends React.Component {
+            render() {
+                return (
+                    <SearchProvider>
+                        <SearchContext.Consumer>
+                            {context =>
+                                <div className="container">
+                                    <SearchControls context={context} />
+                                    <StockPhotosList context={context} />
+                                </div>
+                            }
+                            </SearchContext.Consumer>
+                    </SearchProvider>
+                );
+            }
+        }
+
+        ReactDOM.render(
+            <StockPhotosContainer />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+
+</html>
