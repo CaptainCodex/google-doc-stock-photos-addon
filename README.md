@@ -6,6 +6,7 @@ An add-on that helps you search and add photos to your Google Documents.
 - Context for Data
 - .GS google script server file
 - Babel for ES7 syntax support
+- Upsplash Stock Photos API for searching photos
 
 ## How To Install
 1) Open a new Google Document
