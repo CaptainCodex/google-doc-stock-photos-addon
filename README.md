@@ -1,6 +1,12 @@
 # Google-Doc-Stock-Photos-Plugin
 An add-on that helps you search and add photos to your Google Documents.
 
+## Made With
+- React for UI
+- Context for Data
+- .GS google script server file
+- Babel for ES7 syntax support
+
 ## How To Install
 1) Open a new Google Document
 2) Go to the top menu: "Tools > Script editor" to open a new Browser Tab
