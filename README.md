@@ -1,4 +1,4 @@
-# Google-Doc-Stock-Photos-Plugin
+# Google Doc Stock Photos Addon
 An add-on that helps you search and add photos to your Google Documents.
 
 ## Made With
